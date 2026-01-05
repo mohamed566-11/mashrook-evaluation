@@ -5,6 +5,7 @@ import { Language, FormState } from './types';
 import { StarRating } from './components/StarRating';
 import { LanguageToggle } from './components/LanguageToggle';
 import { FormInput } from './components/FormInput';
+import { supabase } from './lib/supabase';
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('ar');
@@ -64,7 +65,7 @@ const App: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -77,12 +78,43 @@ const App: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    // Simulate API call
-    setTimeout(() => {
+
+    try {
+      // حفظ البيانات في قاعدة البيانات
+      const { data, error } = await supabase
+        .from('evaluations')
+        .insert([
+          {
+            name: formState.name,
+            investor_rep_rating: formState.investorRepRating,
+            advisory_team_rating: formState.advisoryTeamRating,
+            output_quality_rating: formState.outputQualityRating,
+            website_exp_rating: formState.websiteExpRating,
+            will_recommend: formState.willRecommend,
+            reason: formState.reason,
+            other_reason: formState.reason === (isRTL ? 'أخرى' : 'Other') ? formState.otherReason : null,
+            file_url: null, // يمكنك إضافة رفع الملفات لاحقاً
+            file_name: formState.file ? formState.file.name : null,
+          },
+        ])
+        .select();
+
+      if (error) {
+        console.error('Error submitting form:', error);
+        alert(isRTL ? 'حدث خطأ أثناء إرسال التقييم. يرجى المحاولة مرة أخرى.' : 'Error submitting evaluation. Please try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // نجح الإرسال
       setIsSubmitting(false);
       setIsSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 1500);
+    } catch (error) {
+      console.error('Error:', error);
+      alert(isRTL ? 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.' : 'An unexpected error occurred. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
