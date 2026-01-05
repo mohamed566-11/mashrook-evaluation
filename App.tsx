@@ -27,6 +27,9 @@ const App: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [fileSize, setFileSize] = useState<number | null>(null);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -104,35 +107,16 @@ const App: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // رفع الملف إذا كان موجود
+      // الحصول على رابط الملف إذا كان موجود (تم رفعه مسبقاً)
       let fileUrl = null;
       let fileName = null;
 
       if (formState.file) {
         fileName = formState.file.name;
-        const fileExt = fileName.split('.').pop();
-        const fileNameUnique = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('evaluations')
-          .upload(fileNameUnique, formState.file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (uploadError) {
-          console.error('Error uploading file:', uploadError);
-          alert(isRTL ? 'حدث خطأ أثناء رفع الملف. يرجى المحاولة مرة أخرى.' : 'Error uploading file. Please try again.');
-          setIsSubmitting(false);
-          return;
+        // إذا كان الملف قد تم رفعه مسبقاً (يحتوي على uploadedUrl)
+        if ((formState.file as any).uploadedUrl) {
+          fileUrl = (formState.file as any).uploadedUrl;
         }
-
-        // الحصول على رابط الملف العام
-        const { data: { publicUrl } } = supabase.storage
-          .from('evaluations')
-          .getPublicUrl(fileNameUnique);
-
-        fileUrl = publicUrl;
       }
 
       // حفظ البيانات في قاعدة البيانات
@@ -172,9 +156,67 @@ const App: React.FC = () => {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormState({ ...formState, file: e.target.files[0] });
+      const file = e.target.files[0];
+      setFormState({ ...formState, file });
+      setFileSize(file.size);
+      setUploadProgress(0);
+      setIsUploading(true);
+
+      // رفع الملف فوراً
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileNameUnique = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        // محاكاة شريط التقدم
+        const progressInterval = setInterval(() => {
+          setUploadProgress((prev) => {
+            if (prev >= 90) return prev;
+            return prev + 10;
+          });
+        }, 200);
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('evaluations')
+          .upload(fileNameUnique, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+
+        if (uploadError) {
+          console.error('Error uploading file:', uploadError);
+          setUploadProgress(0);
+          setIsUploading(false);
+          alert(isRTL ? 'حدث خطأ أثناء رفع الملف. يرجى المحاولة مرة أخرى.' : 'Error uploading file. Please try again.');
+          setFormState({ ...formState, file: null });
+          setFileSize(null);
+          return;
+        }
+
+        // الحصول على رابط الملف
+        const { data: { publicUrl } } = supabase.storage
+          .from('evaluations')
+          .getPublicUrl(fileNameUnique);
+
+        // حفظ رابط الملف في state (يمكن إضافته في FormState لاحقاً)
+        setFormState({
+          ...formState,
+          file: Object.assign(file, { uploadedUrl: publicUrl, uploadedFileName: fileNameUnique })
+        });
+
+        setIsUploading(false);
+        setTimeout(() => setUploadProgress(0), 500);
+      } catch (error) {
+        console.error('Error:', error);
+        setIsUploading(false);
+        setUploadProgress(0);
+        setFormState({ ...formState, file: null });
+        setFileSize(null);
+      }
     }
   };
 
@@ -360,6 +402,7 @@ const App: React.FC = () => {
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 onChange={handleFileChange}
                 accept="video/*,application/pdf,image/*"
+                disabled={isUploading}
               />
               <div className="flex flex-col items-center gap-2 sm:gap-3 pointer-events-none">
                 <div className="p-2 sm:p-3 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
@@ -368,14 +411,50 @@ const App: React.FC = () => {
                 <span className="text-primary-700 font-medium text-sm sm:text-base truncate max-w-xs">
                   {formState.file ? formState.file.name : (isRTL ? 'اضغط لرفع الملف' : 'Click to upload file')}
                 </span>
+                {fileSize && (
+                  <span className="text-gray-500 text-xs">
+                    {(() => {
+                      const bytes = fileSize;
+                      if (bytes === 0) return '0 Bytes';
+                      const k = 1024;
+                      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                      const i = Math.floor(Math.log(bytes) / Math.log(k));
+                      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+                    })()}
+                  </span>
+                )}
               </div>
             </div>
+
+            {/* Progress Bar */}
+            {isUploading && (
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-600">{isRTL ? 'جاري الرفع...' : 'Uploading...'}</span>
+                  <span className="text-primary-600 font-semibold">{uploadProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-primary-600 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
+            {formState.file && !isUploading && uploadProgress === 0 && (
+              <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-800 text-sm">
+                  {isRTL ? '✓ الملف جاهز للإرسال' : '✓ File ready to submit'}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isUploading}
             className="w-full bg-primary-600 text-white font-bold text-lg sm:text-xl py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
