@@ -33,6 +33,30 @@ const App: React.FC = () => {
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
   }, [lang, isRTL]);
 
+  // اختبار الاتصال بـ Supabase عند تحميل الصفحة
+  useEffect(() => {
+    const testConnection = async () => {
+      console.log('🔍 اختبار الاتصال بـ Supabase...');
+      try {
+        const { data, error } = await supabase
+          .from('evaluations')
+          .select('count')
+          .limit(1);
+
+        if (error) {
+          console.error('❌ خطأ في الاتصال:', error.message);
+          console.error('تفاصيل الخطأ:', error);
+        } else {
+          console.log('✅ الاتصال بـ Supabase ناجح!');
+        }
+      } catch (err) {
+        console.error('❌ خطأ في الاتصال:', err);
+      }
+    };
+
+    testConnection();
+  }, []);
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, boolean> = {};
 
@@ -80,6 +104,37 @@ const App: React.FC = () => {
     setIsSubmitting(true);
 
     try {
+      // رفع الملف إذا كان موجود
+      let fileUrl = null;
+      let fileName = null;
+
+      if (formState.file) {
+        fileName = formState.file.name;
+        const fileExt = fileName.split('.').pop();
+        const fileNameUnique = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('evaluations')
+          .upload(fileNameUnique, formState.file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error('Error uploading file:', uploadError);
+          alert(isRTL ? 'حدث خطأ أثناء رفع الملف. يرجى المحاولة مرة أخرى.' : 'Error uploading file. Please try again.');
+          setIsSubmitting(false);
+          return;
+        }
+
+        // الحصول على رابط الملف العام
+        const { data: { publicUrl } } = supabase.storage
+          .from('evaluations')
+          .getPublicUrl(fileNameUnique);
+
+        fileUrl = publicUrl;
+      }
+
       // حفظ البيانات في قاعدة البيانات
       const { data, error } = await supabase
         .from('evaluations')
@@ -93,8 +148,8 @@ const App: React.FC = () => {
             will_recommend: formState.willRecommend,
             reason: formState.reason,
             other_reason: formState.reason === (isRTL ? 'أخرى' : 'Other') ? formState.otherReason : null,
-            file_url: null, // يمكنك إضافة رفع الملفات لاحقاً
-            file_name: formState.file ? formState.file.name : null,
+            file_url: fileUrl,
+            file_name: fileName,
           },
         ])
         .select();
