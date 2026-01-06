@@ -54,7 +54,6 @@ export const TRANSLATIONS: Record<Language, Translation> = {
         "الاستشارات الإدارية",
         "الاستشارات التسويقية",
         "الاستشارات المالية",
-        "استشارات المطاعم والكوفي شوب",
         "خدمات التمويل"
       ],
       branches: [
@@ -121,7 +120,6 @@ export const TRANSLATIONS: Record<Language, Translation> = {
         "Administrative Consultations",
         "Marketing Consultations",
         "Financial Consultations",
-        "Restaurant & Café Consultations",
         "Financing Services"
       ],
       branches: [
