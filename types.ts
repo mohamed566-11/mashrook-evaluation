@@ -6,6 +6,10 @@ export interface Translation {
   form: {
     nameLabel: string;
     namePlaceholder: string;
+    emailLabel: string;
+    emailPlaceholder: string;
+    phoneLabel: string;
+    phonePlaceholder: string;
     investorRepLabel: string;
     advisoryTeamLabel: string;
     outputQualityLabel: string;
@@ -30,6 +34,8 @@ export interface Translation {
 
 export interface FormState {
   name: string;
+  email: string;
+  phone: string;
   investorRepRating: number;
   advisoryTeamRating: number;
   outputQualityRating: number;

@@ -2,6 +2,8 @@
 CREATE TABLE IF NOT EXISTS evaluations (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
   investor_rep_rating INTEGER NOT NULL CHECK (investor_rep_rating >= 1 AND investor_rep_rating <= 5),
   advisory_team_rating INTEGER NOT NULL CHECK (advisory_team_rating >= 1 AND advisory_team_rating <= 5),
   output_quality_rating INTEGER NOT NULL CHECK (output_quality_rating >= 1 AND output_quality_rating <= 5),

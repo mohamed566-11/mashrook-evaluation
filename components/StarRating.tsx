@@ -13,7 +13,7 @@ export const StarRating: React.FC<StarRatingProps> = ({ label, value, onChange, 
 
   return (
     <div className={`p-4 sm:p-6 bg-white rounded-xl sm:rounded-2xl border transition-colors duration-300 ${error ? 'border-red-300 bg-red-50' : 'border-gray-100 hover:border-primary-200 shadow-sm'}`}>
-      <label className="block text-gray-800 font-semibold mb-2 sm:mb-3 text-base sm:text-lg">{label} <span className="text-red-500">*</span></label>
+      <label className="block text-gray-800 font-semibold mb-2 sm:mb-3 text-sm sm:text-base">{label} <span className="text-red-500">*</span></label>
       <div className="flex gap-1 sm:gap-2">
         {[...Array(5)].map((_, index) => {
           const starIndex = index + 1;

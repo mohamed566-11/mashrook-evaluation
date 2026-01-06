@@ -7,6 +7,10 @@ export const TRANSLATIONS: Record<Language, Translation> = {
     form: {
       nameLabel: "الاسم",
       namePlaceholder: "أدخل اسمك الكريم",
+      emailLabel: "البريد الإلكتروني",
+      emailPlaceholder: "أدخل بريدك الإلكتروني (اختياري)",
+      phoneLabel: "رقم التليفون",
+      phonePlaceholder: "أدخل رقم التليفون (اختياري)",
       investorRepLabel: "كيف تُقيّم أداء ممثل خدمة المستثمر (تم التواصل معه في البداية)؟",
       advisoryTeamLabel: "كيف تُقيّم أداء الفريق الاستشاري (القائم على إعداد محتوى الدراسة)؟",
       outputQualityLabel: "كيف تقيّم جودة المخرجات النهائية (الدراسة / التقرير / التحليل)؟",
@@ -41,6 +45,10 @@ export const TRANSLATIONS: Record<Language, Translation> = {
     form: {
       nameLabel: "Name",
       namePlaceholder: "Enter your name",
+      emailLabel: "Email",
+      emailPlaceholder: "Enter your email (optional)",
+      phoneLabel: "Phone Number",
+      phonePlaceholder: "Enter your phone number (optional)",
       investorRepLabel: "How do you rate the performance of the Investor Service Representative?",
       advisoryTeamLabel: "How do you rate the performance of the Advisory Team?",
       outputQualityLabel: "How do you rate the quality of the final output (Study/Report)?",

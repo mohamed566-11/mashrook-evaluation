@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Upload, CheckCircle, Send } from 'lucide-react';
 import { TRANSLATIONS } from './constants';
 import { Language, FormState } from './types';
@@ -14,6 +14,8 @@ const App: React.FC = () => {
 
   const [formState, setFormState] = useState<FormState>({
     name: '',
+    email: '',
+    phone: '',
     investorRepRating: 0,
     advisoryTeamRating: 0,
     outputQualityRating: 0,
@@ -30,6 +32,7 @@ const App: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [fileSize, setFileSize] = useState<number | null>(null);
+  const lastInputRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -125,6 +128,8 @@ const App: React.FC = () => {
         .insert([
           {
             name: formState.name,
+            email: formState.email.trim() || null,
+            phone: formState.phone.trim() || null,
             investor_rep_rating: formState.investorRepRating,
             advisory_team_rating: formState.advisoryTeamRating,
             output_quality_rating: formState.outputQualityRating,
@@ -227,8 +232,8 @@ const App: React.FC = () => {
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
             <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-primary-600" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">{t.form.successTitle}</h2>
-          <p className="text-gray-600 text-base sm:text-lg leading-relaxed">{t.form.successMessage}</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">{t.form.successTitle}</h2>
+          <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{t.form.successMessage}</p>
         </div>
       </div>
     );
@@ -256,8 +261,8 @@ const App: React.FC = () => {
         {/* Intro Card */}
         <div className="bg-white rounded-2xl sm:rounded-3xl shadow-md p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 border border-gray-100 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-2 bg-primary-500"></div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">{t.title}</h2>
-          <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-3 sm:mb-4">{t.title}</h2>
+          <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
             {t.description}
           </p>
         </div>
@@ -274,6 +279,26 @@ const App: React.FC = () => {
             placeholder={t.form.namePlaceholder}
             required
             error={errors.name}
+          />
+
+          <FormInput
+            label={t.form.emailLabel}
+            value={formState.email}
+            onChange={(val) => {
+              setFormState({ ...formState, email: val });
+            }}
+            placeholder={t.form.emailPlaceholder}
+            type="email"
+          />
+
+          <FormInput
+            label={t.form.phoneLabel}
+            value={formState.phone}
+            onChange={(val) => {
+              setFormState({ ...formState, phone: val });
+            }}
+            placeholder={t.form.phonePlaceholder}
+            type="tel"
           />
 
           <div data-error={errors.investorRepRating || undefined}>
@@ -326,7 +351,7 @@ const App: React.FC = () => {
 
           {/* Yes/No Question */}
           <div className={`p-4 sm:p-6 bg-white rounded-xl sm:rounded-2xl border transition-colors ${errors.willRecommend ? 'border-red-300 bg-red-50' : 'border-gray-100 shadow-sm'}`} data-error={errors.willRecommend || undefined}>
-            <label className="block text-gray-800 font-semibold mb-3 sm:mb-4 text-base sm:text-lg">
+            <label className="block text-gray-800 font-semibold mb-3 sm:mb-4 text-sm sm:text-base">
               {t.form.recommendLabel} <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-2 sm:gap-4">
@@ -336,7 +361,7 @@ const App: React.FC = () => {
                   setFormState({ ...formState, willRecommend: true });
                   if (errors.willRecommend) setErrors({ ...errors, willRecommend: false });
                 }}
-                className={`flex-1 py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg sm:rounded-xl font-semibold transition-all duration-200 border-2 ${formState.willRecommend === true
+                className={`flex-1 py-2.5 sm:py-3 px-4 sm:px-6 text-xs sm:text-sm rounded-lg sm:rounded-xl font-semibold transition-all duration-200 border-2 ${formState.willRecommend === true
                   ? 'border-primary-500 bg-primary-50 text-primary-700'
                   : 'border-gray-200 text-gray-500 hover:border-primary-200'
                   }`}
@@ -349,7 +374,7 @@ const App: React.FC = () => {
                   setFormState({ ...formState, willRecommend: false });
                   if (errors.willRecommend) setErrors({ ...errors, willRecommend: false });
                 }}
-                className={`flex-1 py-2.5 sm:py-3 px-4 sm:px-6 text-sm sm:text-base rounded-lg sm:rounded-xl font-semibold transition-all duration-200 border-2 ${formState.willRecommend === false
+                className={`flex-1 py-2.5 sm:py-3 px-4 sm:px-6 text-xs sm:text-sm rounded-lg sm:rounded-xl font-semibold transition-all duration-200 border-2 ${formState.willRecommend === false
                   ? 'border-red-500 bg-red-50 text-red-700'
                   : 'border-gray-200 text-gray-500 hover:border-red-200'
                   }`}
@@ -360,11 +385,11 @@ const App: React.FC = () => {
           </div>
 
           {/* Reason Selection */}
-          <div className={`p-4 sm:p-6 bg-white rounded-xl sm:rounded-2xl border transition-colors ${errors.reason || errors.otherReason ? 'border-red-300 bg-red-50' : 'border-gray-100 shadow-sm'}`} data-error={errors.reason || errors.otherReason || undefined}>
-            <label className="block text-gray-800 font-semibold mb-2 sm:mb-3 text-base sm:text-lg">{t.form.reasonLabel} <span className="text-red-500">*</span></label>
+          <div ref={lastInputRef} className={`p-4 sm:p-6 bg-white rounded-xl sm:rounded-2xl border transition-colors ${errors.reason || errors.otherReason ? 'border-red-300 bg-red-50' : 'border-gray-100 shadow-sm'}`} data-error={errors.reason || errors.otherReason || undefined}>
+            <label className="block text-gray-800 font-semibold mb-2 sm:mb-3 text-sm sm:text-base">{t.form.reasonLabel} <span className="text-red-500">*</span></label>
             <div className="space-y-2 sm:space-y-3">
               <select
-                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border outline-none transition-all duration-200 ${errors.reason ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-2 sm:focus:ring-4 focus:ring-red-100' : 'border-gray-300 bg-white focus:border-primary-500 focus:ring-2 sm:focus:ring-4 focus:ring-primary-100'} text-gray-700`}
+                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg sm:rounded-xl border outline-none transition-all duration-200 ${errors.reason ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-2 sm:focus:ring-4 focus:ring-red-100' : 'border-gray-300 bg-white focus:border-primary-500 focus:ring-2 sm:focus:ring-4 focus:ring-primary-100'} text-gray-700`}
                 value={formState.reason}
                 onChange={(e) => {
                   setFormState({ ...formState, reason: e.target.value, otherReason: e.target.value === (isRTL ? 'أخرى' : 'Other') ? formState.otherReason : '' });
@@ -379,7 +404,7 @@ const App: React.FC = () => {
               {(formState.reason === (isRTL ? 'أخرى' : 'Other')) && (
                 <input
                   type="text"
-                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl border outline-none transition-all duration-200 mt-2 sm:mt-3 ${errors.otherReason ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-2 sm:focus:ring-4 focus:ring-red-100' : 'border-gray-300 bg-white focus:border-primary-500 focus:ring-2 sm:focus:ring-4 focus:ring-primary-100'} text-gray-700`}
+                  className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm rounded-lg sm:rounded-xl border outline-none transition-all duration-200 mt-2 sm:mt-3 ${errors.otherReason ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-2 sm:focus:ring-4 focus:ring-red-100' : 'border-gray-300 bg-white focus:border-primary-500 focus:ring-2 sm:focus:ring-4 focus:ring-primary-100'} text-gray-700`}
                   placeholder={t.form.otherReasonPlaceholder}
                   value={formState.otherReason}
                   onChange={(e) => {
@@ -393,8 +418,8 @@ const App: React.FC = () => {
 
           {/* File Upload */}
           <div className="p-4 sm:p-6 bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm">
-            <label className="block text-gray-800 font-semibold mb-2 text-base sm:text-lg">{t.form.uploadLabel}</label>
-            <p className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">{t.form.uploadHelp}</p>
+            <label className="block text-gray-800 font-semibold mb-2 text-sm sm:text-base">{t.form.uploadLabel}</label>
+            <p className="text-xs text-gray-500 mb-3 sm:mb-4">{t.form.uploadHelp}</p>
 
             <div className="relative border-2 border-dashed border-primary-200 rounded-lg sm:rounded-xl bg-primary-50 hover:bg-primary-100 transition-colors p-6 sm:p-8 text-center cursor-pointer group">
               <input
@@ -408,7 +433,7 @@ const App: React.FC = () => {
                 <div className="p-2 sm:p-3 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
                   <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
                 </div>
-                <span className="text-primary-700 font-medium text-sm sm:text-base truncate max-w-xs">
+                <span className="text-primary-700 font-medium text-xs sm:text-sm truncate max-w-xs">
                   {formState.file ? formState.file.name : (isRTL ? 'اضغط لرفع الملف' : 'Click to upload file')}
                 </span>
                 {fileSize && (
@@ -455,7 +480,7 @@ const App: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting || isUploading}
-            className="w-full bg-primary-600 text-white font-bold text-lg sm:text-xl py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-primary-600 text-white font-bold text-base sm:text-lg py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-lg shadow-primary-200 hover:bg-primary-700 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>
@@ -472,12 +497,51 @@ const App: React.FC = () => {
 
         </form>
 
-        {/* Footer */}
-        <footer className="mt-8 sm:mt-12 text-center text-gray-400 text-xs sm:text-sm">
-          <p>{t.footer}</p>
-        </footer>
-
       </main>
+
+      {/* Footer */}
+      <footer className="mt-4 sm:mt-6 bg-gradient-to-r from-primary-700 to-primary-600 text-white py-4 sm:py-5">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex flex-row items-center justify-between gap-4 sm:gap-6 flex-wrap">
+            {/* Services and Branches - Left */}
+            <div className="flex flex-row gap-4 sm:gap-6 lg:gap-8 flex-1 min-w-0">
+              {/* Services */}
+              <div className="animate-fade-in flex-shrink-0">
+                <h3 className="text-sm sm:text-base font-bold mb-1.5 sm:mb-2">خدماتنا ومجالاتنا</h3>
+                <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs sm:text-sm">
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">الاستشارات الاقتصادية</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">الاستشارات الإدارية</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">الاستشارات التسويقية</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">الاستشارات المالية</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">استشارات المطاعم والكوفي شوب</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">خدمات التمويل</li>
+                </ul>
+              </div>
+
+              {/* Branches */}
+              <div className="animate-fade-in-delay-1 flex-shrink-0">
+                <h3 className="text-sm sm:text-base font-bold mb-1.5 sm:mb-2">الفروع</h3>
+                <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs sm:text-sm">
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">الرياض</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">دبي</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">الدوحة</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">مسقط</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">بغداد</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">القاهرة</li>
+                  <li className="hover:text-primary-200 transition-colors duration-200 cursor-default">صنعاء</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Copyright - Right */}
+            <div className="animate-fade-in-delay-2 flex-shrink-0">
+              <p className="text-sm sm:text-base font-medium whitespace-nowrap">
+                جميع الحقوق محفوظة © شركة مشروعك 2025
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
