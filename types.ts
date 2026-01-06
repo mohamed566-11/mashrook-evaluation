@@ -20,7 +20,13 @@ export interface Translation {
     otherReasonPlaceholder: string;
     uploadLabel: string;
     uploadHelp: string;
+    uploadButtonText: string;
+    uploading: string;
+    fileReady: string;
     submit: string;
+    errorSubmitting: string;
+    errorUnexpected: string;
+    errorUploading: string;
     submitting: string;
     successTitle: string;
     successMessage: string;
@@ -29,7 +35,15 @@ export interface Translation {
     selectReason: string;
     reasons: string[];
   };
-  footer: string;
+  footer: {
+    servicesTitle: string;
+    branchesTitle: string;
+    companyTitle: string;
+    companyDescription: string;
+    copyright: string;
+    services: string[];
+    branches: string[];
+  };
 }
 
 export interface FormState {

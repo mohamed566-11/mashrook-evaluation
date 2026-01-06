@@ -21,7 +21,13 @@ export const TRANSLATIONS: Record<Language, Translation> = {
       otherReasonPlaceholder: "اكتب السبب...",
       uploadLabel: "تنظم شركة مشروعك استراتيجية جديدة لعام 2027 لعملائها الكرام. هل يوجد إمكانية برفع فيديو أو خطاب شكر موجه لشركة مشروعك؟",
       uploadHelp: "سيتم رفعه على الموقع الخاص بالشركة (مصدر فخر لنا)",
+      uploadButtonText: "اضغط لرفع الملف",
+      uploading: "جاري الرفع...",
+      fileReady: "الملف جاهز للإرسال",
       submit: "إرسال التقييم",
+      errorSubmitting: "حدث خطأ أثناء إرسال التقييم. يرجى المحاولة مرة أخرى.",
+      errorUnexpected: "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
+      errorUploading: "حدث خطأ أثناء رفع الملف. يرجى المحاولة مرة أخرى.",
       submitting: "جاري الإرسال...",
       successTitle: "شكراً لك!",
       successMessage: "تم استلام تقييمك بنجاح. نحن نقدر وقتك ورأيك.",
@@ -37,7 +43,30 @@ export const TRANSLATIONS: Record<Language, Translation> = {
         "أخرى"
       ]
     },
-    footer: "جميع الحقوق محفوظة © شركة مشروعك 2024"
+    footer: {
+      servicesTitle: "خدماتنا ومجالاتنا",
+      branchesTitle: "الفروع",
+      companyTitle: "شركة مشروعك",
+      companyDescription: "نقدم حلول استشارية متكاملة لمساعدة الشركات على النمو والتطور في مختلف المجالات.",
+      copyright: "جميع الحقوق محفوظة © شركة مشروعك 2025",
+      services: [
+        "الاستشارات الاقتصادية",
+        "الاستشارات الإدارية",
+        "الاستشارات التسويقية",
+        "الاستشارات المالية",
+        "استشارات المطاعم والكوفي شوب",
+        "خدمات التمويل"
+      ],
+      branches: [
+        "الرياض",
+        "دبي",
+        "الدوحة",
+        "مسقط",
+        "بغداد",
+        "القاهرة",
+        "صنعاء"
+      ]
+    }
   },
   en: {
     title: "Mashroo3k Company Evaluation",
@@ -59,7 +88,13 @@ export const TRANSLATIONS: Record<Language, Translation> = {
       otherReasonPlaceholder: "Please specify the reason...",
       uploadLabel: "Mashroo3k is organizing a new strategy for 2027. Is it possible to upload a video or thank you letter?",
       uploadHelp: "It will be uploaded to the company's website (a source of pride for us)",
+      uploadButtonText: "Click to upload file",
+      uploading: "Uploading...",
+      fileReady: "File ready to submit",
       submit: "Submit Evaluation",
+      errorSubmitting: "Error submitting evaluation. Please try again.",
+      errorUnexpected: "An unexpected error occurred. Please try again.",
+      errorUploading: "Error uploading file. Please try again.",
       submitting: "Sending...",
       successTitle: "Thank You!",
       successMessage: "Your evaluation has been received successfully. We appreciate your time and feedback.",
@@ -75,6 +110,29 @@ export const TRANSLATIONS: Record<Language, Translation> = {
         "Other"
       ]
     },
-    footer: "All rights reserved © Mashroo3k Company 2024"
+    footer: {
+      servicesTitle: "Our Services & Fields",
+      branchesTitle: "Branches",
+      companyTitle: "Mashroo3k Company",
+      companyDescription: "We provide integrated consulting solutions to help companies grow and develop in various fields.",
+      copyright: "All rights reserved © Mashroo3k Company 2025",
+      services: [
+        "Economic Consultations",
+        "Administrative Consultations",
+        "Marketing Consultations",
+        "Financial Consultations",
+        "Restaurant & Café Consultations",
+        "Financing Services"
+      ],
+      branches: [
+        "Riyadh",
+        "Dubai",
+        "Doha",
+        "Muscat",
+        "Baghdad",
+        "Cairo",
+        "Sana'a"
+      ]
+    }
   }
 };
