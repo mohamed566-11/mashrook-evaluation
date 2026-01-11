@@ -3,7 +3,7 @@ import { Translation, Language } from './types';
 export const TRANSLATIONS: Record<Language, Translation> = {
   ar: {
     title: "تقييم شركة مشروعك",
-    description: "تكمن أهداف شركة مشروعك في توفير التسهيلات لرواد الأعمال وأصحاب المشاريع والمستثمرين والباحثين عن التمويل والراغبين في زيادة استثماراتهم. تقدم مشروعك قاعدة بيانات حديثة ومتطورة تتيح للباحثين والمستثمرين الاطلاع على كافة البيانات بشكل لحظي ومواكبة تطورات السوق.",
+    description: "تكمن أهداف شركة مشروعك في توفير التسهيلات لرواد الأعمال وأصحاب المشاريع والمستثمرين والباحثين عن التمويل والراغبين في زيادة استثماراتهم. تقدم مشروعك قاعدة بيانات حديثة ومتطورة تتيح للباحثين والمستثمرين الاطلاع على كافة البيانات.",
     form: {
       nameLabel: "الاسم",
       namePlaceholder: "أدخل اسمك الكريم",
@@ -69,7 +69,7 @@ export const TRANSLATIONS: Record<Language, Translation> = {
   },
   en: {
     title: "Mashroo3k Company Evaluation",
-    description: "The goals of Mashroo3k Company lie in providing facilities for entrepreneurs, project owners, investors, those seeking funding, and those wishing to increase their investments. Mashroo3k offers a modern and advanced database that allows researchers and investors to review all data in real time.",
+    description: "The goals of Mashroo3k Company lie in providing facilities for entrepreneurs, project owners, investors, those seeking funding, and those wishing to increase their investments. Mashroo3k offers a modern and advanced database that allows researchers and investors to review all data .",
     form: {
       nameLabel: "Name",
       namePlaceholder: "Enter your name",
