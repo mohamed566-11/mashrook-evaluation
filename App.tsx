@@ -6,6 +6,7 @@ import { StarRating } from './components/StarRating';
 import { LanguageToggle } from './components/LanguageToggle';
 import { FormInput } from './components/FormInput';
 import { supabase } from './lib/supabase';
+import { ValidationUtils } from './lib/validation';
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('ar');
@@ -28,7 +29,7 @@ const App: React.FC = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [errors, setErrors] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [fileSize, setFileSize] = useState<number | null>(null);
@@ -64,31 +65,48 @@ const App: React.FC = () => {
   }, []);
 
   const validateForm = (): boolean => {
-    const newErrors: Record<string, boolean> = {};
+    const newErrors: Record<string, string> = {};
 
     if (!formState.name.trim()) {
-      newErrors.name = true;
+      newErrors.name = 'الاسم مطلوب';
     }
+
+    // Validate phone number if provided
+    if (formState.phone && formState.phone.trim() !== '') {
+      const phoneValidation = ValidationUtils.validatePhone(formState.phone, lang);
+      if (!phoneValidation.isValid) {
+        newErrors.phone = phoneValidation.errorMessage || (lang === 'ar' ? 'رقم الهاتف غير صحيح' : 'Invalid phone number');
+      }
+    }
+
+    // Validate email if provided
+    if (formState.email && formState.email.trim() !== '') {
+      const emailValidation = ValidationUtils.validateEmail(formState.email, lang);
+      if (!emailValidation.isValid) {
+        newErrors.email = emailValidation.errorMessage || (lang === 'ar' ? 'البريد الإلكتروني غير صحيح' : 'Invalid email address');
+      }
+    }
+
     if (formState.investorRepRating === 0) {
-      newErrors.investorRepRating = true;
+      newErrors.investorRepRating = 'الرجاء تقييم أداء ممثل خدمة المستثمر';
     }
     if (formState.advisoryTeamRating === 0) {
-      newErrors.advisoryTeamRating = true;
+      newErrors.advisoryTeamRating = 'الرجاء تقييم أداء الفريق الاستشاري';
     }
     if (formState.outputQualityRating === 0) {
-      newErrors.outputQualityRating = true;
+      newErrors.outputQualityRating = 'الرجاء تقييم جودة المخرجات النهائية';
     }
     if (formState.websiteExpRating === 0) {
-      newErrors.websiteExpRating = true;
+      newErrors.websiteExpRating = 'الرجاء تقييم تجربتك مع موقعنا';
     }
     if (formState.willRecommend === null) {
-      newErrors.willRecommend = true;
+      newErrors.willRecommend = 'الرجاء اختيار إجابة';
     }
     if (!formState.reason.trim()) {
-      newErrors.reason = true;
+      newErrors.reason = 'السبب مطلوب';
     }
     if (formState.reason === (isRTL ? 'أخرى' : 'Other') && !formState.otherReason.trim()) {
-      newErrors.otherReason = true;
+      newErrors.otherReason = 'السبب الآخر مطلوب';
     }
 
     setErrors(newErrors);
@@ -277,7 +295,11 @@ const App: React.FC = () => {
             value={formState.name}
             onChange={(val) => {
               setFormState({ ...formState, name: val });
-              if (errors.name) setErrors({ ...errors, name: false });
+              if (errors.name) {
+                const updatedErrors = { ...errors };
+                delete updatedErrors.name;
+                setErrors(updatedErrors);
+              }
             }}
             placeholder={t.form.namePlaceholder}
             required
@@ -289,10 +311,17 @@ const App: React.FC = () => {
             value={formState.phone}
             onChange={(val) => {
               setFormState({ ...formState, phone: val });
+              if (errors.phone) {
+                const updatedErrors = { ...errors };
+                delete updatedErrors.phone;
+                setErrors(updatedErrors);
+              }
             }}
             placeholder={t.form.phonePlaceholder}
             type="tel"
             placeholderRight={isRTL}
+            error={!!errors.phone}
+            errorMessage={errors.phone}
           />
 
           <FormInput
@@ -300,9 +329,16 @@ const App: React.FC = () => {
             value={formState.email}
             onChange={(val) => {
               setFormState({ ...formState, email: val });
+              if (errors.email) {
+                const updatedErrors = { ...errors };
+                delete updatedErrors.email;
+                setErrors(updatedErrors);
+              }
             }}
             placeholder={t.form.emailPlaceholder}
             type="email"
+            error={!!errors.email}
+            errorMessage={errors.email}
           />
 
           <div data-error={errors.investorRepRating || undefined}>
@@ -397,6 +433,7 @@ const App: React.FC = () => {
             </label>
             <div className="space-y-3 sm:space-y-4">
               <select
+                aria-label={t.form.reasonLabel}
                 className={`w-full px-4 sm:px-5 py-3 sm:py-3.5 text-sm sm:text-base rounded-xl border outline-none transition-all duration-200 shadow-sm ${errors.reason ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-100' : 'border-gray-300 bg-white focus:border-primary-500 focus:ring-2 focus:ring-primary-100 hover:border-primary-300'} text-gray-700 font-medium`}
                 value={formState.reason}
                 onChange={(e) => {
@@ -435,6 +472,7 @@ const App: React.FC = () => {
             <div className="relative border-2 border-dashed border-primary-300 rounded-xl bg-gradient-to-br from-primary-50 to-primary-100/50 hover:from-primary-100 hover:to-primary-200/50 transition-all duration-300 p-8 sm:p-10 text-center cursor-pointer group shadow-inner">
               <input
                 type="file"
+                aria-label="file upload"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                 onChange={handleFileChange}
                 accept="video/*,application/pdf,image/*"
